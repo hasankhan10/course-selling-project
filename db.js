@@ -8,7 +8,10 @@ const UserSchema = new Schema({
     password:String,
     firstName:String,
     lastName:String,
-    role:{type:String,enum:["User", "Admin"],default:"User"}
+    role:{type:String,default:"User"},
+    courseId:[
+        {type:ObjectId,ref:"course"}
+    ]
 })
 
 const AdminSchema = new Schema({
@@ -16,6 +19,10 @@ const AdminSchema = new Schema({
     password:String,
     firstName:String,
     lastName:String,
+    role:{type:String,default:"Admin"},
+    courseId:[
+        {type:ObjectId,ref:"course"}
+    ]
 })
 
 const CourseSchema = new Schema({

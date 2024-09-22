@@ -6,11 +6,12 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 
 adminRouter.post("/signup",async (req,res)=>{
-    const {email,password,firstname,lastname} = req.body
-    if (!email || !password || !firstname || !lastname) {
-        return res.status(400).json({ message: "Missing required fields in the request body." });
-    }
+    
     try {
+        const {email,password,firstname,lastname} = req.body
+        if (!email || !password || !firstname || !lastname) {
+            return res.status(400).json({ message: "Missing required fields in the request body." });
+        }
         const existAdmin = await AdminModel.findOne({email:email})
         if(existAdmin){
             res.json({
@@ -50,6 +51,7 @@ adminRouter.post("/signin",async (req,res)=>{
             res.status(404).json({
                 messege:"User not found."
             })
+            return
         }
         const matchedPassword = await bcrypt.compare(password,existAdmin.password)
 
@@ -57,6 +59,7 @@ adminRouter.post("/signin",async (req,res)=>{
             res.status(404).json({
                 messege:"Password not matched."
             })
+            return
         }
         const token = jwt.sign({id:existAdmin._id},process.env.JWT_SECRET)
         res.status(200).json({
@@ -73,11 +76,11 @@ adminRouter.post("/signin",async (req,res)=>{
 adminRouter.post("/create",auth,(req,res)=>{
     const adminId = req.id
     try {
-        if(adminId)[
+        if(adminId){
             res.status(200).json({
                 messege:"You can create your course"
             })
-        ]
+        }
     } catch (error) {
         res.status(401).json({
             messege:"You are not authenticate."
