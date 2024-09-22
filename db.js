@@ -3,22 +3,22 @@ const Schema = mongoose.Schema
 const ObjectId = mongoose.Types.ObjectId
 
 
-const UserScheama = new Schema({
+const UserSchema = new Schema({
     email:{type:String, unique:true},
     password:String,
     firstName:String,
     lastName:String,
-    role:"User"|"Admin"
+    role:{type:String,enum:["User", "Admin"],default:"User"}
 })
 
-const AdminScheama = new Schema({
+const AdminSchema = new Schema({
     email:{type:String, unique:true},
     password:String,
     firstName:String,
     lastName:String,
 })
 
-const CourseScheama = new Schema({
+const CourseSchema = new Schema({
     title:String,
     description:String,
     price:Number,
@@ -26,15 +26,15 @@ const CourseScheama = new Schema({
     creatorId:ObjectId
 })
 
-const PurchasesScheama = new Schema({
+const PurchasesSchema = new Schema({
     userId:ObjectId,
     courseId:ObjectId
 })
 
-const UserModel = mongoose.model("user",UserScheama)
-const AdminModel = mongoose.model("admin",AdminScheama)
-const CourseModel = mongoose.model("course",CourseScheama)
-const PurchasesModel = mongoose.model("purchase",PurchasesScheama)
+const UserModel = mongoose.model("user",UserSchema)
+const AdminModel = mongoose.model("admin",AdminSchema)
+const CourseModel = mongoose.model("course",CourseSchema)
+const PurchasesModel = mongoose.model("purchase",PurchasesSchema)
 
 module.exports ={
     UserModel,

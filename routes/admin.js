@@ -34,7 +34,7 @@ adminRouter.delete("/delete",(req,res)=>{
 
 adminRouter.get("/all",(req,res)=>{
     res.json({
-        messege:"all courses course endpoint"
+        messege:"all courses endpoint"
     })
 })
 
