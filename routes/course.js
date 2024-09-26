@@ -1,22 +1,32 @@
 const {Router} = require("express")
 const courseRouter = Router()
-const{CourseModel,UserModel} = require("../db")
-const { auth } = require("../middleware/auth")
+const{CourseModel,PurchasesModel} = require("../db")
+const { userAuth } = require("../middleware/auth")
 
-courseRouter.get("/purchased",auth,async(req,res)=>{
+courseRouter.get("/purchased",userAuth,async(req,res)=>{
     try {
         const userId = req.id
-        if(userId){
-            const user = await UserModel.findById({
-                _id:userId
-            })
-            const usersCourses = user.courseId
-            res.status(200).json({
-                messege:"Here is your purchased Courses.",
-                usersCourses:usersCourses
-            })
-        }
-        
+        const courseId = req.body.courseId
+       // use zod here
+
+       //check the user already bought the course or not.
+       const boughtCourse = await PurchasesModel.findOne({
+            userId,
+            courseId
+       })
+       if(boughtCourse){
+        res.status(200).json({
+            messege:"You have already bought this course."
+        })
+        return
+       }
+       await PurchasesModel.create({
+            userId,
+            courseId
+       })
+       res.status(200).json({
+        messege:"You succesffully bought this course."
+       })
     } catch (error) {
         res.status(401).json({
             messege:"You are not authenticate."
@@ -26,7 +36,7 @@ courseRouter.get("/purchased",auth,async(req,res)=>{
 
 courseRouter.get("/preview",async(req,res)=>{
     try {
-        const allCourses = await CourseModel.find()
+        const allCourses = await CourseModel.find({})
         res.status(200).json({
             messege:"Here is all the courses.",
             allCourses:allCourses

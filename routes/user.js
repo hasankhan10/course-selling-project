@@ -1,9 +1,9 @@
 const {Router} = require("express")
 const userRouter = Router()
-const{UserModel} = require("../db")
+const{UserModel,PurchasesModel} = require("../db")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-const {auth} = require("../middleware/auth")
+const {userAuth} = require("../middleware/auth")
 
 userRouter.post("/signup",async (req,res)=>{
     try {
@@ -67,7 +67,7 @@ userRouter.post("/signin",async (req,res)=>{
             })
             return
         }
-        const token = jwt.sign({id:existUser._id},process.env.JWT_SECRET)
+        const token = jwt.sign({id:existUser._id},process.env.JWT_USER_SECRET)
         res.status(200).json({
             messege:"Signin successfully",
             token:token
@@ -80,20 +80,18 @@ userRouter.post("/signin",async (req,res)=>{
     }
 })
 
-userRouter.get("/purchases",auth,async(req,res)=>{
+userRouter.get("/purchases",userAuth,async(req,res)=>{
     try {
         const userId = req.id
         if(userId){
-            const user = await UserModel.findById({
-                _id:userId
-            })
-            const usersCourses = user.courseId
-            res.status(200).json({
-                messege:"Here is your purchased Courses.",
-                usersCourses:usersCourses
+            const purchasesCourse = await PurchasesModel.find({
+                userId
             })
         }
-        
+        res.status(200).json({
+            messege:"Here is all your purchases courses.",
+            purchasesCourse
+        })
     } catch (error) {
         res.status(401).json({
             messege:"You are not authenticate."
