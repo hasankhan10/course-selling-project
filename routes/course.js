@@ -3,6 +3,7 @@ const courseRouter = Router()
 const{CourseModel,PurchasesModel} = require("../db")
 const { userAuth } = require("../middleware/auth")
 
+//full course purchased route is complete.
 courseRouter.get("/purchased",userAuth,async(req,res)=>{
     try {
         const userId = req.id
@@ -34,6 +35,7 @@ courseRouter.get("/purchased",userAuth,async(req,res)=>{
     }
 })
 
+//full course preview route is complete.
 courseRouter.get("/preview",async(req,res)=>{
     try {
         const allCourses = await CourseModel.find({})
