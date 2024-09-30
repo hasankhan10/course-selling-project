@@ -3,25 +3,38 @@ const userRouter = Router()
 const{UserModel,PurchasesModel} = require("../db")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const {z} = require("zod")
 const {userAuth} = require("../middleware/auth")
 
+//full user signup route complete.
 userRouter.post("/signup",async (req,res)=>{
+    //adding zod validation.
+    const userSignupSchema = z.object({
+        email: z.string().email(),
+        password: z.string().min(4),
+        firstname: z.string().min(1),
+        lastname: z.string().min(1)
+    })
+    const checkData = userSignupSchema.safeParse(req.body)
+    if(!checkData.success){
+        const errorDetails = checkData.error.issues.map((issue)=>{
+            return (issue.path+" "+issue.message)
+        })
+        return res.status(404).json({
+            messege:"Incorrect format.",
+            error:errorDetails
+        })
+    }
     try {
+        //check if user is exist or not!
         const {email,password,firstname,lastname} = req.body
-        if(!email || !password || !firstname || !lastname){
-            res.status(400).json({
-                messege:"Missing require field in the request body."
-            })
-            return
-        }
         const existUser = await UserModel.findOne({
             email:email
         })
         if(existUser){
-            res.json({
+            return res.json({
                 messege:"User already exist."
             })
-            return
         }
 
         const encryptPassword = await bcrypt.hash(password,5)
@@ -31,7 +44,6 @@ userRouter.post("/signup",async (req,res)=>{
             firstName:firstname,
             lastName:lastname
         })
-
         res.status(200).json({
             messege:"Signup Successfully."
         })
@@ -43,14 +55,25 @@ userRouter.post("/signup",async (req,res)=>{
     }
 })
 
+//full user signin route complete.
 userRouter.post("/signin",async (req,res)=>{
+    const userSiginSchema = z.object({
+        email: z.string().email(),
+        password: z.string().min(4)
+    })
+    const checkData = userSiginSchema.safeParse(req.body)
+    if(!checkData.success){
+        const errorDetails = checkData.error.issues.map((issue)=>{
+            return (issue.path+" "+issue.message)
+        })
+        return res.status(500).json({
+            messege:"Format not matched.",
+            error:errorDetails
+        })
+    }
     try {
         const {email,password} = req.body
-        if(!email || !password){
-            res.status(400).json({
-                messege:"Missing require field in the request body."
-            })
-        }
+        //check user is exist or not.
         const existUser = await UserModel.findOne({
             email:email
         })
@@ -80,14 +103,13 @@ userRouter.post("/signin",async (req,res)=>{
     }
 })
 
-userRouter.get("/purchases",userAuth,async(req,res)=>{
+//full user purchased route complete.
+userRouter.get("/purchased",userAuth,async(req,res)=>{
     try {
         const userId = req.id
-        if(userId){
-            const purchasesCourse = await PurchasesModel.find({
-                userId
-            })
-        }
+        const purchasesCourse = await PurchasesModel.find({
+            userId:userId
+        })
         res.status(200).json({
             messege:"Here is all your purchases courses.",
             purchasesCourse
